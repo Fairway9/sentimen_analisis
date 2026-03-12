@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Instagram Sentiment Report – Fairway Nine Mall 2026</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;1,700&family=DM+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#06090F; --bg2:#0B1119; --bg3:#111A26;
+  --border:#182336; --border2:#1E2E42;
+  --text:#DCE8F5; --muted:#3D5470; --muted2:#6B8BAD;
+  --fairway:#00D48E; --pakuwon:#F56565; --tunjungan:#EDB855; --galaxy:#A78BFA; --ciputra:#38BDF8;
+  --pos:#00D48E; --neu:#3D5470; --neg:#F56565;
+  --warn:#F59E0B; --danger:#EF4444;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;min-height:100vh;font-size:14px;}
+
+/* NAV */
+.nav{position:sticky;top:0;z-index:100;background:#06090Fdd;backdrop-filter:blur(16px);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 40px;overflow-x:auto;}
+.nav-brand{font-family:'Playfair Display',serif;font-size:13px;color:var(--fairway);padding:14px 28px 14px 0;margin-right:28px;border-right:1px solid var(--border);white-space:nowrap;flex-shrink:0;}
+.nav-link{padding:14px 12px;font-size:11px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent;transition:all .2s;letter-spacing:.3px;text-decoration:none;display:block;}
+.nav-link:hover{color:var(--text);}
+.nav-link.active{color:var(--fairway);border-bottom-color:var(--fairway);}
+
+/* COVER */
+.cover{background:linear-gradient(160deg,#0B1827 0%,#06090F 60%);padding:52px 60px 44px;border-bottom:1px solid var(--border);position:relative;overflow:hidden;}
+.cover::before{content:'';position:absolute;top:-100px;right:-100px;width:500px;height:500px;background:radial-gradient(circle,#00D48E08 0%,transparent 65%);pointer-events:none;}
+.cover-tag{display:inline-block;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:4px;color:var(--fairway);border:1px solid #00D48E30;border-radius:4px;padding:3px 10px;margin-bottom:18px;}
+.cover-title{font-family:'Playfair Display',serif;font-size:40px;font-weight:800;line-height:1.1;color:#F0F8FF;letter-spacing:-1px;}
+.cover-title span{color:var(--fairway);font-style:italic;}
+.cover-sub{font-size:13px;color:var(--muted2);margin-top:10px;line-height:1.7;}
+.cover-meta{display:flex;gap:16px;margin-top:26px;flex-wrap:wrap;}
+.meta-pill{display:flex;align-items:center;gap:8px;background:#ffffff06;border:1px solid var(--border2);border-radius:8px;padding:8px 14px;}
+.meta-pill-label{font-size:9px;color:var(--muted);font-family:'DM Mono',monospace;letter-spacing:1px;}
+.meta-pill-val{font-size:12px;font-weight:700;color:var(--text);}
+.cover-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:32px;}
+.cover-stat{background:#ffffff05;border:1px solid var(--border2);border-radius:12px;padding:16px 18px;text-align:center;}
+.cover-stat-num{font-size:28px;font-weight:800;line-height:1;}
+.cover-stat-lbl{font-size:9px;color:var(--muted);margin-top:4px;font-family:'DM Mono',monospace;letter-spacing:1px;}
+
+/* SECTIONS */
+.section{padding:40px 60px;border-bottom:1px solid var(--border);}
+.section-tag{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:4px;color:var(--muted);text-transform:uppercase;margin-bottom:6px;}
+.section-title{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:#F0F8FF;}
+.section-desc{font-size:12px;color:var(--muted2);margin-top:6px;line-height:1.6;margin-bottom:24px;}
+
+/* CARDS */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:22px;}
+.card-label{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;margin-bottom:5px;}
+.card-title{font-size:13px;font-weight:700;color:#F0F8FF;margin-bottom:16px;}
+
+/* ALERT BOXES */
+.alert{border-radius:12px;padding:18px 20px;margin-bottom:16px;}
+.alert-warn{background:#F59E0B0D;border:1px solid #F59E0B30;}
+.alert-danger{background:#EF44440D;border:1px solid #EF444430;}
+.alert-ok{background:#00D48E0D;border:1px solid #00D48E30;}
+.alert-label{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:3px;margin-bottom:8px;}
+.alert-body{font-size:12px;line-height:1.7;color:var(--muted2);}
+
+/* GRIDS */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
+.g32{display:grid;grid-template-columns:1.4fr 1fr;gap:16px;}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+.gmb{margin-bottom:16px;}
+
+/* BRAND TABS */
+.brand-tabs{display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap;}
+.brand-tab{padding:7px 16px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;font-size:11px;font-weight:700;font-family:'Plus Jakarta Sans',sans-serif;transition:all .2s;}
+.brand-tab:hover{color:var(--text);}
+.brand-tab.active{color:#fff;}
+.you-badge{margin-left:5px;font-size:8px;background:var(--fairway);color:var(--bg);border-radius:3px;padding:1px 5px;font-weight:800;vertical-align:middle;}
+
+/* PCT BARS */
+.pct-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.pct-label{font-size:12px;color:var(--muted2);width:60px;flex-shrink:0;}
+.pct-bar-t{flex:1;height:8px;background:var(--border2);border-radius:4px;overflow:hidden;}
+.pct-bar-f{height:100%;border-radius:4px;transition:width .7s cubic-bezier(.4,0,.2,1);}
+.pct-val{font-size:13px;font-weight:700;width:42px;text-align:right;flex-shrink:0;}
+
+/* QUOTE */
+.quote{padding:9px 14px;border-left:2px solid;border-radius:0 8px 8px 0;margin-bottom:8px;font-size:11px;color:#9DB4CC;font-style:italic;line-height:1.6;background:#ffffff04;}
+
+/* TAGS */
+.tags{display:flex;flex-wrap:wrap;gap:6px;}
+.tag{padding:3px 11px;border-radius:20px;font-size:10px;font-weight:600;border:1px solid;}
+
+/* USP CARD */
+.usp-card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:18px 20px;}
+.usp-header{display:flex;align-items:center;gap:12px;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--border);}
+.usp-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.usp-name{font-size:13px;font-weight:700;color:#F0F8FF;}
+.usp-tagline{font-size:10px;color:var(--muted2);margin-top:2px;}
+.usp-item{display:flex;align-items:flex-start;gap:8px;margin-bottom:8px;font-size:11px;color:var(--muted2);line-height:1.5;}
+.usp-icon{flex-shrink:0;margin-top:1px;}
+.usp-stat{display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:#ffffff04;border-radius:6px;margin-top:6px;}
+.usp-stat-key{font-size:10px;color:var(--muted);}
+.usp-stat-val{font-size:11px;font-weight:700;}
+.usp-kw{margin-top:10px;}
+
+/* RANKING */
+.rank-row{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:10px;margin-bottom:8px;}
+.rank-medal{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0;}
+.rank-info{flex:1;}
+.rank-name{font-size:12px;font-weight:700;color:#F0F8FF;margin-bottom:5px;}
+.rank-bar-t{background:var(--border);border-radius:4px;height:4px;}
+.rank-bar-f{height:4px;border-radius:4px;}
+.rank-score{font-size:22px;font-weight:800;}
+
+/* GAP TABLE */
+.gap-table{width:100%;border-collapse:collapse;font-size:12px;}
+.gap-table th{padding:10px 14px;text-align:left;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--muted);border-bottom:1px solid var(--border);text-transform:uppercase;}
+.gap-table td{padding:11px 14px;border-bottom:1px solid var(--border);vertical-align:middle;}
+.gap-table tr:last-child td{border-bottom:none;}
+.gap-table tr:hover td{background:#ffffff02;}
+.gap-badge{display:inline-block;padding:2px 9px;border-radius:12px;font-size:10px;font-weight:700;}
+.gap-pos{background:#00D48E15;color:#00D48E;}
+.gap-neg{background:#EF444415;color:#EF4444;}
+.gap-warn{background:#F59E0B15;color:#F59E0B;}
+
+/* ACTION PLAN */
+.ap-horizon{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;margin-bottom:10px;padding:0 0 6px;border-bottom:1px solid var(--border);}
+.ap-item{display:flex;gap:14px;padding:12px 0;border-bottom:1px solid var(--border);}
+.ap-item:last-child{border-bottom:none;}
+.ap-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
+.ap-body{flex:1;}
+.ap-title{font-size:13px;font-weight:700;color:#F0F8FF;margin-bottom:3px;}
+.ap-desc{font-size:11px;color:var(--muted2);line-height:1.6;}
+.ap-meta{display:flex;gap:6px;margin-top:7px;flex-wrap:wrap;}
+.ap-chip{font-size:9px;font-family:'DM Mono',monospace;padding:2px 8px;border-radius:4px;border:1px solid;letter-spacing:.5px;}
+.ap-own{border-color:#38BDF830;color:#38BDF8;background:#38BDF810;}
+.ap-h{border-color:#EF444430;color:#EF4444;background:#EF444410;}
+.ap-m{border-color:#F59E0B30;color:#F59E0B;background:#F59E0B10;}
+.ap-l{border-color:#00D48E30;color:#00D48E;background:#00D48E10;}
+
+/* SWOT */
+.swot-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);border-radius:14px;overflow:hidden;}
+.swot-cell{background:var(--bg2);padding:22px;}
+.swot-cell-label{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:3px;margin-bottom:12px;text-transform:uppercase;}
+.swot-item{font-size:11px;color:var(--muted2);padding:5px 0;border-bottom:1px solid var(--border);line-height:1.5;}
+.swot-item:last-child{border-bottom:none;}
+
+/* REALITY CHECK CALLOUT */
+.reality{background:linear-gradient(135deg,#EF444408,#F59E0B05);border:1px solid #EF444425;border-radius:14px;padding:22px 26px;margin-bottom:16px;}
+.reality-title{font-family:'Playfair Display',serif;font-size:15px;color:#EF4444;margin-bottom:12px;}
+.reality-body{font-size:12px;color:var(--muted2);line-height:1.8;}
+
+/* KPI ROW */
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px;}
+.kpi-box{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:16px 18px;}
+.kpi-num{font-size:26px;font-weight:800;line-height:1.1;}
+.kpi-lbl{font-size:9px;color:var(--muted);font-family:'DM Mono',monospace;letter-spacing:1px;margin-top:4px;}
+.kpi-note{font-size:10px;margin-top:6px;line-height:1.4;}
+.kpi-up{color:var(--pos);}
+.kpi-dn{color:var(--danger);}
+.kpi-warn{color:var(--warn);}
+
+/* FOOTNOTE */
+.report-footer{padding:28px 60px;display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--border);}
+.footer-brand{font-family:'Playfair Display',serif;font-size:15px;color:var(--fairway);}
+.footer-note{font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:2px;text-align:right;line-height:1.8;}
+
+@media(max-width:900px){
+  .cover,.section{padding:28px 24px;}
+  .g2,.g3,.g32,.g4,.kpi-row,.cover-grid{grid-template-columns:1fr;}
+  .swot-grid{grid-template-columns:1fr;}
+  .nav{padding:0 20px;}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-brand">Fairway Nine · Intelligence Report</div>
+  <a class="nav-link active" href="#executive" onclick="setNav(this)">Executive Summary</a>
+  <a class="nav-link" href="#sentiment" onclick="setNav(this)">Sentiment Overview</a>
+  <a class="nav-link" href="#usp" onclick="setNav(this)">USP & Positioning</a>
+  <a class="nav-link" href="#competitor" onclick="setNav(this)">Competitor Analysis</a>
+  <a class="nav-link" href="#gap" onclick="setNav(this)">Gap Analysis</a>
+  <a class="nav-link" href="#swot" onclick="setNav(this)">SWOT</a>
+</nav>
+
+<!-- COVER -->
+<div class="cover" id="executive">
+  <div class="cover-tag">CONFIDENTIAL · Instagram Sentiment Intelligence Report · Q1 2026</div>
+  <div class="cover-title">Social Media<br><span>Sentiment Analysis</span></div>
+  <div class="cover-sub">Analisis komprehensif komentar Instagram Fairway Nine Mall vs 4 kompetitor utama Surabaya<br>Disertai Gap Analysis dan analisis SWOT · Maret 2026</div>
+  <div class="cover-meta">
+    <div class="meta-pill"><div><div class="meta-pill-label">Sumber Data</div><div class="meta-pill-val">Komentar Instagram (UGC + Konten)</div></div></div>
+    <div class="meta-pill"><div><div class="meta-pill-label">Periode Analisis</div><div class="meta-pill-val">Q1 2026</div></div></div>
+    <div class="meta-pill"><div><div class="meta-pill-label">Brand Dianalisis</div><div class="meta-pill-val">5 Mall Surabaya</div></div></div>
+  </div>
+  <div class="cover-grid">
+    <div class="cover-stat">
+      <div class="cover-stat-num" style="color:var(--fairway)">184</div>
+      <div class="cover-stat-lbl">Total Komentar</div>
+    </div>
+    <div class="cover-stat" style="border-color:#EF444430">
+      <div class="cover-stat-num" style="color:#EF4444">24</div>
+      <div class="cover-stat-lbl">Komentar F9 (Terendah)</div>
+    </div>
+    <div class="cover-stat" style="border-color:#F59E0B30">
+      <div class="cover-stat-num" style="color:#F59E0B">40%!</div>
+      <div class="cover-stat-lbl">Okupansi F9 (Est.)</div>
+    </div>
+    <div class="cover-stat">
+      <div class="cover-stat-num" style="color:var(--fairway)">75</div>
+      <div class="cover-stat-lbl">Skor Sentimen F9</div>
+    </div>
+  </div>
+
+  <!-- Critical Context Box -->
+  <div style="margin-top:28px">
+    <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:4px;color:var(--muted);margin-bottom:12px">KONTEKS KRITIS — BACA SEBELUM INTERPRETASI DATA</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
+      <div class="alert alert-danger" style="margin-bottom:0">
+        <div class="alert-label" style="color:#EF4444">⚠️ LOW ENGAGEMENT SIGNAL</div>
+        <div class="alert-body">Komentar yang dianalisis <strong style="color:var(--text)">mayoritas berasal dari konten UGC (user-generated)</strong> — bukan dari postingan resmi @fairwayninemall. Ini menandakan konten resmi mall belum mampu memancing interaksi audiens secara signifikan.</div>
+      </div>
+      <div class="alert alert-warn" style="margin-bottom:0">
+        <div class="alert-label" style="color:#F59E0B">⚡ VANITY METRIC RISK</div>
+        <div class="alert-body">Zero komentar negatif <strong style="color:var(--text)">BUKAN pertanda kepuasan tinggi</strong>. Dengan hanya 24 total komentar vs rata-rata kompetitor 40, data ini lebih mencerminkan <strong style="color:var(--text)">rendahnya awareness & dwell time</strong> daripada keberhasilan brand.</div>
+      </div>
+      <div class="alert alert-ok" style="margin-bottom:0">
+        <div class="alert-label" style="color:var(--fairway)">✓ GENUINE STRENGTH</div>
+        <div class="alert-body">Komentar positif yang ada benar-benar organik dan tulus — bukan dipancing. Aspek <strong style="color:var(--text)">estetika & desain</strong> menjadi daya tarik nyata yang perlu dimonetisasi menjadi footfall dan dwell time lebih panjang.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SENTIMENT OVERVIEW -->
+<div class="section" id="sentiment">
+  <div class="section-tag">01 · Sentiment Overview</div>
+  <div class="section-title">Distribusi Sentimen per Brand</div>
+  <div class="section-desc">Semua angka dalam persentase (%) dari total komentar per brand. Klik tab untuk melihat detail tiap brand.</div>
+
+  <div class="brand-tabs">
+    <button class="brand-tab active" onclick="switchBrand('fairway',this)" id="tab-fairway" style="border-color:var(--fairway);color:var(--fairway)">Fairway Nine <span class="you-badge">ANDA</span></button>
+    <button class="brand-tab" onclick="switchBrand('pakuwon',this)" id="tab-pakuwon">Pakuwon Mall</button>
+    <button class="brand-tab" onclick="switchBrand('tunjungan',this)" id="tab-tunjungan">Tunjungan Plaza</button>
+    <button class="brand-tab" onclick="switchBrand('galaxy',this)" id="tab-galaxy">Galaxy Mall</button>
+    <button class="brand-tab" onclick="switchBrand('ciputra',this)" id="tab-ciputra">Ciputra World</button>
+  </div>
+
+  <div class="g32 gmb">
+    <div style="display:grid;grid-template-columns:170px 1fr;gap:14px">
+      <!-- Score -->
+      <div class="card" style="display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px 14px" id="scoreCard">
+        <div class="card-label">Sentiment Score</div>
+        <div id="scoreNum" style="font-family:'Playfair Display',serif;font-size:56px;font-weight:800;line-height:1;color:var(--fairway)">75</div>
+        <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:2px">/ 100</div>
+        <div style="width:100%;background:var(--border2);border-radius:6px;height:5px;margin:12px 0 8px">
+          <div id="scoreBar" style="height:5px;border-radius:6px;background:var(--fairway);width:75%;transition:width .7s"></div>
+        </div>
+        <div id="scoreTotal" style="font-size:11px;color:var(--muted)">24 komentar</div>
+        <div id="zeroBadge" style="margin-top:10px;padding:4px 12px;border-radius:20px;font-size:9px;font-weight:800;font-family:'DM Mono',monospace;letter-spacing:1px;background:#F59E0B12;border:1px solid #F59E0B35;color:#F59E0B">⚠ VOLUME RENDAH</div>
+      </div>
+      <!-- PCT Bars -->
+      <div class="card">
+        <div class="card-label">Distribusi Sentimen (%)</div>
+        <div class="card-title" id="distTitle">Fairway Nine Mall</div>
+        <div id="pctBars"></div>
+        <div style="margin-top:14px" id="brandContextBox"></div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr;gap:14px">
+      <div class="card">
+        <div class="card-label">Top Komentar Positif</div>
+        <div class="card-title" id="commentsTitle">Fairway Nine Mall</div>
+        <div id="commentsList"></div>
+      </div>
+      <div class="card" style="display:flex;align-items:center;gap:16px;padding:18px 20px">
+        <div style="width:110px;height:110px;flex-shrink:0"><canvas id="pieChart"></canvas></div>
+        <div style="flex:1" id="pieLegend"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Comparison Bar -->
+  <div class="card">
+    <div class="card-label">Perbandingan Semua Brand</div>
+    <div class="card-title">Distribusi Sentimen (%) — Positif · Netral · Negatif</div>
+    <canvas id="barChart" height="80"></canvas>
+    <div style="margin-top:14px;padding:12px 14px;background:#EF444408;border:1px solid #EF444425;border-radius:8px">
+      <span style="font-size:11px;color:var(--muted2)">💡 <strong style="color:#EF4444">Catatan Penting:</strong> Volume komentar Fairway Nine (24) hanya 56% dari rata-rata kompetitor (40,5). Bar chart menampilkan persentase — bukan volume absolut — sehingga distribusi terlihat "sehat". Namun kecilnya volume adalah sinyal nyata yang tidak boleh diabaikan.</span>
+    </div>
+  </div>
+</div>
+
+<!-- USP & POSITIONING -->
+<div class="section" id="usp">
+  <div class="section-tag">02 · USP & Consumer Positioning</div>
+  <div class="section-title">Keunggulan Unik dari Kacamata Konsumen</div>
+  <div class="section-desc">Kata kunci sentimen dikaitkan dengan kondisi aktual tiap mall berdasarkan data publik. Ini adalah persepsi konsumen yang terbentuk dari pengalaman nyata.</div>
+
+  <!-- 5 equal USP cards — 3 top row, 2 bottom row -->
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:14px">
+
+    <!-- Fairway Nine -->
+    <div class="usp-card" style="border-color:#00D48E35;display:flex;flex-direction:column">
+      <div class="usp-header">
+        <div class="usp-dot" style="background:#00D48E"></div>
+        <div>
+          <div class="usp-name">Fairway Nine Mall <span class="you-badge">ANDA</span></div>
+          <div class="usp-tagline">"Premium Lifestyle · Golf Course View · West Surabaya"</div>
+        </div>
+      </div>
+      <div class="card-label" style="margin-bottom:7px">💬 Persepsi Konsumen</div>
+      <div class="tags" style="margin-bottom:12px">
+        <span class="tag" style="background:#00D48E12;border-color:#00D48E35;color:#00D48E;font-size:9px">📸 Instagramable</span>
+        <span class="tag" style="background:#00D48E12;border-color:#00D48E35;color:#00D48E;font-size:9px">🌿 Desain Estetik</span>
+        <span class="tag" style="background:#00D48E12;border-color:#00D48E35;color:#00D48E;font-size:9px">🎯 Event Komunitas</span>
+        <span class="tag" style="background:#00D48E12;border-color:#00D48E35;color:#00D48E;font-size:9px">🔍 Hidden Gem</span>
+      </div>
+      <div style="font-size:10px;color:var(--muted2);line-height:1.65;flex:1">
+        Desain outdoor estetis unik dengan <strong style="color:var(--text)">Fairway Walk menghadap lapangan golf</strong> — differentiator visual nyata. Namun okupansi sekitar <strong style="color:#EF4444">40%</strong>, dua anchor tenant besar tutup (Informa & Azko), dan F&B yang ada bersifat transaksional. Pengunjung datang untuk foto, belum ada alasan kuat untuk berlama-lama.
+      </div>
+      <div style="margin-top:12px;border-top:1px solid var(--border);padding-top:10px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px">
+        <div class="usp-stat" style="flex-direction:column;text-align:center;padding:5px 6px"><span class="usp-stat-key" style="font-size:8px">Followers IG</span><span class="usp-stat-val" style="color:#F59E0B;font-size:12px">15K</span></div>
+        <div class="usp-stat" style="flex-direction:column;text-align:center;padding:5px 6px"><span class="usp-stat-key" style="font-size:8px">Okupansi</span><span class="usp-stat-val" style="color:#EF4444;font-size:12px">40%</span></div>
+        <div class="usp-stat" style="flex-direction:column;text-align:center;padding:5px 6px"><span class="usp-stat-key" style="font-size:8px">Traffic/bln</span><span class="usp-stat-val" style="color:#F59E0B;font-size:12px">~50K</span></div>
+      </div>
+    </div>
+
+    <!-- Pakuwon Mall -->
+    <div class="usp-card" style="border-color:#F5656530;display:flex;flex-direction:column">
+      <div class="usp-header">
+        <div class="usp-dot" style="background:#F56565"></div>
+        <div>
+          <div class="usp-name">Pakuwon Mall</div>
+          <div class="usp-tagline">"Terbesar di Indonesia · One-Stop Shopping"</div>
+        </div>
+      </div>
+      <div class="card-label" style="margin-bottom:7px">💬 Persepsi Konsumen</div>
+      <div class="tags" style="margin-bottom:12px">
+        <span class="tag" style="background:#F5656512;border-color:#F5656535;color:#F56565;font-size:9px">🛍 Terlengkap</span>
+        <span class="tag" style="background:#F5656512;border-color:#F5656535;color:#F56565;font-size:9px">🍔 Kuliner Hits</span>
+        <span class="tag" style="background:#F5656512;border-color:#F5656535;color:#F56565;font-size:9px">👗 Fashion First</span>
+        <span class="tag" style="background:#F5656512;border-color:#F5656535;color:#F56565;font-size:9px">🎉 Pop-Up Viral</span>
+      </div>
+      <div style="font-size:10px;color:var(--muted2);line-height:1.65;flex:1">
+        Mall terbesar Indonesia — <strong style="color:var(--text)">180.000 sqm, 1000+ tenant</strong>. H&M, Bershka, Uniqlo, Lotte Mart, Chipmunks. Engagement tertinggi (42 komentar). Kekuatan utama adalah <strong style="color:var(--text)">kelengkapan pilihan: belanja, makan, hiburan semua dalam satu atap</strong>. Sesekali ada pop-up yang sukses viral.
+      </div>
+      <div style="margin-top:12px;border-top:1px solid var(--border);padding-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:6px">
+        <div class="usp-stat" style="flex-direction:column;text-align:center;padding:5px 6px"><span class="usp-stat-key" style="font-size:8px">Followers IG</span><span class="usp-stat-val" style="color:#F56565;font-size:12px">~80K</span></div>
+        <div class="usp-stat" style="flex-direction:column;text-align:center;padding:5px 6px"><span class="usp-stat-key" style="font-size:8px">Komentar</span><span class="usp-stat-val" style="color:#F56565;font-size:12px">42</span></div>
+      </div>
+    </div>
+
+    <!-- Tunjungan Plaza -->
+    <div class="usp-card" style="border-color:#EDB85530;display:flex;flex-direction:column">
+      <div class="usp-header">
+        <div class="usp-dot" style="background:#EDB855"></div>
+        <div>
+          <div class="usp-name">Tunjungan Plaza</div>
+          <div class="usp-tagline">"Ikon Kota · Landmark Surabaya"</div>
+        </div>
+      </div>
+      <div class="card-label" style="margin-bottom:7px">💬 Persepsi Konsumen</div>
+      <div class="tags" style="margin-bottom:12px">
+        <span class="tag" style="background:#EDB85512;border-color:#EDB85535;color:#EDB855;font-size:9px">🏙 Ikon Surabaya</span>
+        <span class="tag" style="background:#EDB85512;border-color:#EDB85535;color:#EDB855;font-size:9px">🎟 Pop-Up Hits</span>
+        <span class="tag" style="background:#EDB85512;border-color:#EDB85535;color:#EDB855;font-size:9px">💎 Brand Premium</span>
+        <span class="tag" style="background:#EDB85512;border-color:#EDB85535;color:#EDB855;font-size:9px">🎬 IMAX Cinema</span>
+      </div>
+      <div style="font-size:10px;color:var(--muted2);line-height:1.65;flex:1">
+        TP 1–6, <strong style="color:var(--text)">600+ tenant</strong>, IMAX pertama Surabaya, SOGO, Zara, Michael Kors. Berlokasi di CBD pusat kota. USP terkuat: <strong style="color:var(--text)">legitimasi & prestige kota</strong> — TP adalah referensi default warga Surabaya untuk brand premium dan event skala besar.
+      </div>
+      <div style="margin-top:12px;border-top:1px solid var(--border);padding-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:6px">
+        <div class="usp-stat" style="flex-direction:column;text-align:center;padding:5px 6px"><span class="usp-stat-key" style="font-size:8px">Followers IG</span><span class="usp-stat-val" style="color:#EDB855;font-size:12px">251K</span></div>
+        <div class="usp-stat" style="flex-direction:column;text-align:center;padding:5px 6px"><span class="usp-stat-key" style="font-size:8px">Komentar</span><span class="usp-stat-val" style="color:#EDB855;font-size:12px">39</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:14px;max-width:67%;margin-left:auto;margin-right:auto">
+
+    <!-- Galaxy Mall -->
+    <div class="usp-card" style="border-color:#A78BFA30;display:flex;flex-direction:column">
+      <div class="usp-header">
+        <div class="usp-dot" style="background:#A78BFA"></div>
+        <div>
+          <div class="usp-name">Galaxy Mall</div>
+          <div class="usp-tagline">"Mall Favorit Surabaya Timur"</div>
+        </div>
+      </div>
+      <div class="card-label" style="margin-bottom:7px">💬 Persepsi Konsumen</div>
+      <div class="tags" style="margin-bottom:12px">
+        <span class="tag" style="background:#A78BFA12;border-color:#A78BFA35;color:#A78BFA;font-size:9px">❤️ Brand Loyal</span>
+        <span class="tag" style="background:#A78BFA12;border-color:#A78BFA35;color:#A78BFA;font-size:9px">🍖 K-Food Scene</span>
+        <span class="tag" style="background:#A78BFA12;border-color:#A78BFA35;color:#A78BFA;font-size:9px">🎄 Dekorasi Seasonal</span>
+        <span class="tag" style="background:#A78BFA12;border-color:#A78BFA35;color:#A78BFA;font-size:9px">🌉 Sky Bridge</span>
+      </div>
+      <div style="font-size:10px;color:var(--muted2);line-height:1.65;flex:1">
+        GM 1-2-3 dengan <strong style="color:var(--text)">sky bridge antar gedung</strong>, KKV, H&M, 99 Ranch Market, dekorasi seasonal premium. Mendominasi Surabaya Timur selama bertahun-tahun. USP terkuat adalah <strong style="color:var(--text)">emotional attachment</strong> — ungkapan "mall favoritku" mencerminkan loyalitas yang sulit dibangun dan sangat berharga.
+      </div>
+      <div style="margin-top:12px;border-top:1px solid var(--border);padding-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:6px">
+        <div class="usp-stat" style="flex-direction:column;text-align:center;padding:5px 6px"><span class="usp-stat-key" style="font-size:8px">Followers IG</span><span class="usp-stat-val" style="color:#A78BFA;font-size:12px">~60K</span></div>
+        <div class="usp-stat" style="flex-direction:column;text-align:center;padding:5px 6px"><span class="usp-stat-key" style="font-size:8px">Komentar</span><span class="usp-stat-val" style="color:#A78BFA;font-size:12px">36</span></div>
+      </div>
+    </div>
+
+    <!-- Ciputra World -->
+    <div class="usp-card" style="border-color:#38BDF830;display:flex;flex-direction:column">
+      <div class="usp-header">
+        <div class="usp-dot" style="background:#38BDF8"></div>
+        <div>
+          <div class="usp-name">Ciputra World</div>
+          <div class="usp-tagline">"Superblock Premium · Immersive Experience"</div>
+        </div>
+      </div>
+      <div class="card-label" style="margin-bottom:7px">💬 Persepsi Konsumen</div>
+      <div class="tags" style="margin-bottom:12px">
+        <span class="tag" style="background:#38BDF812;border-color:#38BDF835;color:#38BDF8;font-size:9px">🌏 Serasa Luar Negeri</span>
+        <span class="tag" style="background:#38BDF812;border-color:#38BDF835;color:#38BDF8;font-size:9px">🎭 BPlay Immersive</span>
+        <span class="tag" style="background:#38BDF812;border-color:#38BDF835;color:#38BDF8;font-size:9px">👨‍👩‍👧 Family Destination</span>
+        <span class="tag" style="background:#38BDF812;border-color:#38BDF835;color:#38BDF8;font-size:9px">✨ Viral Experience</span>
+      </div>
+      <div style="font-size:10px;color:var(--muted2);line-height:1.65;flex:1">
+        Superblock <strong style="color:var(--text)">9 hektar</strong>, terintegrasi hotel bintang 5 & office tower. BPlay — 8 room immersive experience yang viral — menjadi magnet utama. USP terkuat: <strong style="color:var(--text)">experience destination</strong> — bukan sekadar belanja, tapi destinasi yang layak dijadikan tujuan utama perjalanan.
+      </div>
+      <div style="margin-top:12px;border-top:1px solid var(--border);padding-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:6px">
+        <div class="usp-stat" style="flex-direction:column;text-align:center;padding:5px 6px"><span class="usp-stat-key" style="font-size:8px">Followers IG</span><span class="usp-stat-val" style="color:#38BDF8;font-size:12px">133K</span></div>
+        <div class="usp-stat" style="flex-direction:column;text-align:center;padding:5px 6px"><span class="usp-stat-key" style="font-size:8px">Komentar</span><span class="usp-stat-val" style="color:#38BDF8;font-size:12px">43</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Instagram Followers Comparison -->
+  <div class="card">
+    <div class="card-label">Perbandingan Followers Instagram</div>
+    <div class="card-title">Indikator Audience Reach & Brand Awareness</div>
+    <canvas id="followersBar" height="60"></canvas>
+    <div style="margin-top:12px;font-size:11px;color:var(--muted2);line-height:1.7;padding:10px 14px;background:#EF444408;border-radius:8px;border:1px solid #EF444425">
+      ⚠️ <strong style="color:#EF4444">Fairway Nine: 15K followers</strong> vs Tunjungan Plaza 251K, Ciputra World 133K. Kesenjangan ini secara langsung menjelaskan mengapa volume komentar Fairway Nine hanya 24 — <strong style="color:var(--text)">reach konten sangat terbatas</strong>. Zero negatif bukan prestasi bila audiens yang melihat konten memang sangat sedikit.
+    </div>
+  </div>
+</div>
+
+<!-- COMPETITOR ANALYSIS -->
+<div class="section" id="competitor">
+  <div class="section-tag">03 · Competitor Analysis</div>
+  <div class="section-title">Perbandingan Kompetitif</div>
+  <div class="section-desc">Visualisasi multidimensi posisi Fairway Nine vs kompetitor dari aspek sentimen, engagement, dan positioning aktual.</div>
+
+  <div class="g2 gmb">
+    <div class="card">
+      <div class="card-label">Ranking Skor Sentimen</div>
+      <div class="card-title">Berdasarkan % Komentar Positif</div>
+      <div id="rankingList"></div>
+    </div>
+    <div class="card">
+      <div class="card-label">Spider Chart · 5 Dimensi Kompetitif</div>
+      <div class="card-title">Peta Kekuatan Antar Brand</div>
+      <canvas id="radarChart" height="210"></canvas>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px" id="radarLegend"></div>
+    </div>
+  </div>
+
+  <div class="g2">
+    <div class="card">
+      <div class="card-label">Volume Komentar (Total)</div>
+      <div class="card-title">Engagement Aktual — Jumlah Komentar per Brand</div>
+      <canvas id="horizontalBar" height="180"></canvas>
+      <div style="margin-top:12px;font-size:11px;color:var(--muted2);line-height:1.6">Volume komentar mencerminkan seberapa banyak konten (resmi maupun UGC) memancing interaksi. Fairway Nine paling rendah — ini adalah <strong style="color:var(--text)">indikator utama gap awareness</strong> yang harus diatasi sebelum metric lain bisa bermakna.</div>
+    </div>
+    <div class="card">
+      <div class="card-label">Gap Analysis — Sentimen vs Volume</div>
+      <div class="card-title">Kualitas vs Kuantitas Engagement</div>
+      <canvas id="bubbleChart" height="180"></canvas>
+      <div style="margin-top:12px;font-size:11px;color:var(--muted2);line-height:1.6">Bubble chart: sumbu X = volume komentar, sumbu Y = skor sentimen, ukuran = followers Instagram. <strong style="color:var(--fairway)">Fairway Nine</strong> ada di kuadran kiri atas: sentimen bagus, volume rendah — <strong style="color:var(--text)">potensial tapi belum tereksekusi.</strong></div>
+    </div>
+  </div>
+</div>
+
+<!-- GAP ANALYSIS -->
+<div class="section" id="gap">
+  <div class="section-tag">04 · Gap Analysis</div>
+  <div class="section-title">Analisis Kesenjangan Strategis</div>
+  <div class="section-desc">Gap antara kondisi Fairway Nine saat ini vs benchmark terbaik di tiap dimensi. Berbasis data sentimen, kondisi aktual mall, dan data publik.</div>
+
+  <div class="kpi-row">
+    <div class="kpi-box" style="border-color:#EF444430">
+      <div class="kpi-lbl">Engagement Gap vs Benchmark</div>
+      <div class="kpi-num kpi-dn">-19</div>
+      <div class="kpi-note kpi-dn">44% di bawah Ciputra (43 komentar)</div>
+    </div>
+    <div class="kpi-box" style="border-color:#F59E0B30">
+      <div class="kpi-lbl">Followers Gap vs Tunjungan</div>
+      <div class="kpi-num kpi-warn">-236K</div>
+      <div class="kpi-note kpi-warn">F9: 15K | TP: 251K followers</div>
+    </div>
+    <div class="kpi-box" style="border-color:#F59E0B30">
+      <div class="kpi-lbl">Okupansi vs Target 2026</div>
+      <div class="kpi-num kpi-warn">-42%</div>
+      <div class="kpi-note kpi-warn">40% saat ini, target 82%</div>
+    </div>
+    <div class="kpi-box" style="border-color:#00D48E30">
+      <div class="kpi-lbl">Gap Skor Sentimen vs Leader</div>
+      <div class="kpi-num kpi-up">-2 poin</div>
+      <div class="kpi-note kpi-up">F9: 75 | Ciputra: 77 (terkecil)</div>
+    </div>
+  </div>
+
+  <div class="g2 gmb">
+    <div class="card">
+      <div class="card-label">Gap Radar · F9 vs Benchmark vs Target</div>
+      <div class="card-title">Posisi Saat Ini dan Jarak ke Target</div>
+      <canvas id="gapRadar" height="220"></canvas>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div class="alert alert-danger">
+        <div class="alert-label" style="color:#EF4444">🔴 GAP KRITIS — PERLU TINDAKAN SEGERA</div>
+        <div class="alert-body"><strong style="color:var(--text)">Brand Awareness & Reach:</strong> Followers 15K vs rata-rata kompetitor 130K. Konten official mall tidak menjangkau cukup audiens sehingga data sentimen menjadi tidak representatif. Ini akar masalah utama.</div>
+      </div>
+      <div class="alert alert-danger">
+        <div class="alert-label" style="color:#EF4444">🔴 GAP KRITIS — PERLU TINDAKAN SEGERA</div>
+        <div class="alert-body"><strong style="color:var(--text)">Dwell Time & Tenant Mix:</strong> Tenant F&B (Yoshinoya, J.CO, Chatime) bersifat transaksional — tidak mendorong kunjungan panjang. Informa & Azko sudah tutup. Tanpa anchor tenant yang compelling, pengunjung datang untuk foto lalu pergi.</div>
+      </div>
+      <div class="alert alert-warn">
+        <div class="alert-label" style="color:#F59E0B">🟡 GAP SIGNIFIKAN — PERLU PERHATIAN</div>
+        <div class="alert-body"><strong style="color:var(--text)">UGC & Komunitas:</strong> Komentar berasal dari event organizer & komunitas mitra (cheerleading, gaming, yoga) — bukan visitor reguler. Belum terbentuk kultur "selalu ke Fairway Nine" seperti Galaxy Mall.</div>
+      </div>
+      <div class="alert alert-ok">
+        <div class="alert-label" style="color:var(--fairway)">🟢 KEUNGGULAN NYATA — PERTAHANKAN</div>
+        <div class="alert-body"><strong style="color:var(--text)">Estetika & Desain:</strong> Satu-satunya mall Surabaya yang terintegrasi langsung dengan lapangan golf. Fairway Walk outdoor area adalah differentiator autentik yang tidak dimiliki kompetitor.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-label">Tabel Gap Detail — 9 Dimensi Strategis</div>
+    <div class="card-title">Fairway Nine vs Kompetitor</div>
+    <table class="gap-table">
+      <thead>
+        <tr>
+          <th>Dimensi</th>
+          <th>Fairway Nine</th>
+          <th>Pakuwon</th>
+          <th>Tunjungan</th>
+          <th>Galaxy</th>
+          <th>Ciputra</th>
+          <th>Status Fairway</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong style="color:var(--text)">Skor Sentimen</strong></td>
+          <td style="color:var(--fairway);font-weight:700">75</td>
+          <td>67</td><td>72</td><td>75</td><td style="color:#38BDF8;font-weight:700">77</td>
+          <td><span class="gap-badge gap-pos">Kompetitif</span></td>
+        </tr>
+        <tr>
+          <td><strong style="color:var(--text)">Volume Komentar</strong></td>
+          <td style="color:#EF4444;font-weight:700">24 ⚠</td>
+          <td>42</td><td>39</td><td>36</td><td style="color:#38BDF8;font-weight:700">43</td>
+          <td><span class="gap-badge gap-neg">Gap Kritis -44%</span></td>
+        </tr>
+        <tr>
+          <td><strong style="color:var(--text)">Followers Instagram</strong></td>
+          <td style="color:#EF4444;font-weight:700">15K ⚠</td>
+          <td>~80K</td><td style="color:#38BDF8;font-weight:700">251K</td><td>~60K</td><td>133K</td>
+          <td><span class="gap-badge gap-neg">Gap Sangat Besar</span></td>
+        </tr>
+        <tr>
+          <td><strong style="color:var(--text)">% Komentar Positif</strong></td>
+          <td style="color:var(--fairway);font-weight:700">75%</td>
+          <td>67%</td><td>72%</td><td>75%</td><td style="color:#38BDF8;font-weight:700">77%</td>
+          <td><span class="gap-badge gap-pos">Sangat Baik</span></td>
+        </tr>
+        <tr>
+          <td><strong style="color:var(--text)">Tenant Kekinian F&B</strong></td>
+          <td style="color:#EF4444;font-weight:700">Rendah ⚠</td>
+          <td>Tinggi</td><td>Tinggi</td><td>Medium</td><td style="color:#38BDF8;font-weight:700">Tinggi</td>
+          <td><span class="gap-badge gap-neg">Gap Signifikan</span></td>
+        </tr>
+        <tr>
+          <td><strong style="color:var(--text)">Dwell Time Visitor</strong></td>
+          <td style="color:#EF4444;font-weight:700">Rendah ⚠</td>
+          <td>Tinggi</td><td>Tinggi</td><td>Medium</td><td>Tinggi</td>
+          <td><span class="gap-badge gap-neg">Gap Signifikan</span></td>
+        </tr>
+        <tr>
+          <td><strong style="color:var(--text)">Okupansi Tenant</strong></td>
+          <td style="color:#F59E0B;font-weight:700">40% ⚡</td>
+          <td>~95%</td><td>~98%</td><td>~76%</td><td>~90%</td>
+          <td><span class="gap-badge gap-neg">Masih Jauh</span></td>
+        </tr>
+        <tr>
+          <td><strong style="color:var(--text)">Instagramability</strong></td>
+          <td style="color:var(--fairway);font-weight:700">Sangat Tinggi</td>
+          <td>Medium</td><td>Medium</td><td>Tinggi</td><td style="color:#38BDF8;font-weight:700">Sangat Tinggi</td>
+          <td><span class="gap-badge gap-pos">Keunggulan Utama</span></td>
+        </tr>
+        <tr>
+          <td><strong style="color:var(--text)">Signature Experience</strong></td>
+          <td style="color:#F59E0B;font-weight:700">Belum ada</td>
+          <td>One-stop</td><td>TP Landmark</td><td>K-Food &amp; Loyalty</td><td style="color:#38BDF8;font-weight:700">BPlay Immersive</td>
+          <td><span class="gap-badge gap-warn">Perlu Diciptakan</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- SWOT -->
+<div class="section" id="swot">
+  <div class="section-tag">05 · SWOT Analysis</div>
+  <div class="section-title">Analisis SWOT — Fairway Nine Mall</div>
+  <div class="section-desc">Berdasarkan data sentimen, kondisi aktual mall (Oktober 2025 – Maret 2026), dan perbandingan kompetitor.</div>
+  <div class="swot-grid">
+    <div class="swot-cell" style="border-right:1px solid var(--border);border-bottom:1px solid var(--border)">
+      <div class="swot-cell-label" style="color:var(--fairway)">💪 Strengths — Kekuatan</div>
+      <div class="swot-item">✦ Desain estetis & konsep outdoor Fairway Walk unik — satu-satunya mall dengan view lapangan golf di Surabaya</div>
+      <div class="swot-item">✦ Zero komentar negatif = tidak ada masalah pengalaman yang memburuk</div>
+      <div class="swot-item">✦ Diversifikasi event komunitas (gaming, yoga, cheerleading, cosplay) aktif</div>
+      <div class="swot-item">✦ Target market jelas: premium lifestyle, young middle-up Surabaya Barat</div>
+      <div class="swot-item">✦ Rencana hotel Hyatt Centric 2027 = future brand equity yang signifikan</div>
+    </div>
+    <div class="swot-cell" style="border-bottom:1px solid var(--border)">
+      <div class="swot-cell-label" style="color:#EF4444">⚠️ Weaknesses — Kelemahan</div>
+      <div class="swot-item">✦ Okupansi baru 57.4% — dua anchor tenant besar (Informa, Azko) baru keluar</div>
+      <div class="swot-item">✦ Followers IG hanya 15K vs rata-rata kompetitor 130K — reach sangat terbatas</div>
+      <div class="swot-item">✦ Tenant F&B bersifat mainstream & transaksional — tidak mendorong dwell time panjang</div>
+      <div class="swot-item">✦ Volume komentar terendah (24) — konten official belum memancing engagement</div>
+      <div class="swot-item">✦ Belum ada "reason to stay" yang kuat — pengunjung cenderung datang untuk event/foto lalu pergi</div>
+    </div>
+    <div class="swot-cell" style="border-right:1px solid var(--border)">
+      <div class="swot-cell-label" style="color:#38BDF8">🚀 Opportunities — Peluang</div>
+      <div class="swot-item">✦ Modal visual/estetika kuat = siap dijadikan platform content creator & influencer</div>
+      <div class="swot-item">✦ Slot tenant kosong = peluang menghadirkan F&B kekinian yang belum ada di kompetitor</div>
+      <div class="swot-item">✦ Segmen wellness & active lifestyle belum ada yang dominasi di Surabaya</div>
+      <div class="swot-item">✦ Fairway Walk outdoor = satu-satunya outdoor lifestyle hub di Surabaya Barat</div>
+      <div class="swot-item">✦ Event tematik 2026 yang direncanakan manajemen bisa menjadi viral trigger</div>
+    </div>
+    <div class="swot-cell">
+      <div class="swot-cell-label" style="color:#F59E0B">🛡️ Threats — Ancaman</div>
+      <div class="swot-item">✦ Ciputra World agresif berinovasi (BPlay dll) dan sudah memimpin di skor sentimen</div>
+      <div class="swot-item">✦ Pakuwon Mall mendominasi volume & kelengkapan — sangat sulit disaingi di skala itu</div>
+      <div class="swot-item">✦ Galaxy Mall memiliki emotional loyalty yang dalam di Surabaya Timur</div>
+      <div class="swot-item">✦ Jika tenant baru tidak masuk cepat, persepsi "mall sepi" bisa menguat di media sosial</div>
+      <div class="swot-item">✦ Konsumen Surabaya semakin selektif — konten generik tidak cukup untuk menarik kunjungan</div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div class="report-footer">
+  <div>
+    <div class="footer-brand">Fairway Nine Mall</div>
+    <div style="font-size:11px;color:var(--muted2);margin-top:4px">Instagram Sentiment Intelligence Report · Q1 2026</div>
+  </div>
+  <div class="footer-note">
+    Analisis berbasis komentar Instagram & data publik mall · Maret 2026<br>
+    CONFIDENTIAL — Hanya untuk penggunaan internal
+  </div>
+</div>
+
+<script>
+const B = {
+  fairway:   {name:"Fairway Nine Mall", short:"Fairway Nine",  color:"#00D48E", pos:18,neu:6,neg:0,total:24,score:75,followers:15,
+    kw:["📸 Instagramable","🌿 Desain Estetik","🎯 Event Komunitas","🔍 Hidden Gem"],
+    ctx:"<strong style='color:#F59E0B'>⚠ Perhatian:</strong> Komentar ini mayoritas berasal dari UGC (konten creator/event organizer yang menandai mall), bukan dari postingan resmi @fairwayninemall. Ini mengindikasikan konten official belum mampu memancing engagement mandiri.",
+    comments:['"ih bagusss tempatnya" – @yavabali','"tempatnya bagus aku suka!" – @aroundworldwithani','"Besttttt seru bgttt 😍🔥" – follower','"benerrr tempatnya cakep" – follower']},
+  pakuwon:   {name:"Pakuwon Mall",       short:"Pakuwon Mall",  color:"#F56565", pos:28,neu:12,neg:2,total:42,score:67,followers:80,
+    kw:["🛍 Terlengkap","🍔 Kuliner Hits","👗 Fashion First","🎯 One-Stop"],
+    ctx:"Engagement tertinggi (42 komentar). Komentar negatif minor terkait durasi pop-up event yang terlalu singkat. Sebagai mall terbesar Indonesia, kekuatan utama ada di keragaman pilihan.",
+    comments:['"Koleksi nya bagus semua auto borong nih" – follower','"Wah mantap nih ramai terus ya" – follower','"Ice milooonya enaaak poll" – follower','"Mantap! Bagus bagus banget modelnya" – follower']},
+  tunjungan: {name:"Tunjungan Plaza",    short:"Tunjungan Plaza",color:"#EDB855", pos:28,neu:8,neg:3,total:39,score:72,followers:251,
+    kw:["🏙 Ikon Surabaya","🎟 Pop-Up Hits","💎 Brand Luxury","🛒 Terlengkap"],
+    ctx:"Sentimen negatif tertinggi (8%) dari kekecewaan event IAM Auto Modified. Namun kekuatan TP sebagai ikon kota (251K followers) menjadikannya referensi utama untuk pop-up brand premium.",
+    comments:['"Promonya banyak ya rugi kalau di skip" – follower','"Harus bgt kesini aku suka bgt popmart 😍" – follower','"Rekomend banget nihh tempatnya" – follower','"Mantap banyak banget promonya" – follower']},
+  galaxy:    {name:"Galaxy Mall",        short:"Galaxy Mall",   color:"#A78BFA", pos:27,neu:7,neg:2,total:36,score:75,followers:60,
+    kw:["❤️ Mall Favorit","🍖 K-Food Scene","🎄 Dekorasi Seasonal","🏆 Brand Loyal"],
+    ctx:"Brand loyalty terkuat di Surabaya Timur. Komentar 'mall favoritku' menunjukkan emotional attachment nyata — ini yang paling sulit dibangun dan paling berharga. Komentar negatif hanya soal kejelasan info event.",
+    comments:['"Setiap seasons selalu ke Galaxy Mall, mall favoritku" – follower','"serasa di koreaa 😍" – follower','"Keren pooll.. cocok buat destinasi liburan" – follower','"Enak polll ini Chadol signature best" – follower']},
+  ciputra:   {name:"Ciputra World",      short:"Ciputra World", color:"#38BDF8", pos:33,neu:8,neg:2,total:43,score:77,followers:133,
+    kw:["🌏 Serasa Luar Negeri","🎭 BPlay Immersive","👨‍👩‍👧 Family Destination","✨ Viral Experience"],
+    ctx:"Skor tertinggi (77%) dengan volume tertinggi (43). BPlay immersive experience menjadi differentiator yang viral dan konsisten direkomendasikan. Benchmark terbaik untuk Fairway Nine dalam hal menciptakan signature experience.",
+    comments:['"Berasa di luar negeri, padahal ini Indonesia!" – follower','"Masuk sini serasa kayak pindah dimensi" – follower','"Sering2 adain acara seru kek beginian dong! 🔥" – follower','"Keren pooll cocok buat destinasi liburan sama anak" – follower']}
+};
+const RANK=['ciputra','fairway','galaxy','tunjungan','pakuwon'];
+function pct(v,t){return Math.round(v/t*100);}
+function hexA(h,a){const r=parseInt(h.slice(1,3),16),g=parseInt(h.slice(3,5),16),b=parseInt(h.slice(5,7),16);return`rgba(${r},${g},${b},${a})`;}
+
+let pieInst;
+
+function buildPie(b){
+  if(pieInst)pieInst.destroy();
+  pieInst=new Chart(document.getElementById('pieChart').getContext('2d'),{
+    type:'doughnut',
+    data:{labels:['Positif','Netral','Negatif'],datasets:[{data:[b.pos,b.neu,b.neg],backgroundColor:['#00D48E','#1E2E42','#F56565'],borderWidth:0,hoverOffset:4}]},
+    options:{cutout:'68%',plugins:{legend:{display:false}},animation:{duration:500}}
+  });
+}
+
+function buildBar(){
+  new Chart(document.getElementById('barChart').getContext('2d'),{
+    type:'bar',
+    data:{
+      labels:Object.values(B).map(b=>b.short),
+      datasets:[
+        {label:'Positif %',data:Object.values(B).map(b=>pct(b.pos,b.total)),backgroundColor:'#00D48E',borderRadius:4,borderSkipped:false},
+        {label:'Netral %', data:Object.values(B).map(b=>pct(b.neu,b.total)),backgroundColor:'#1E2E42',borderRadius:4,borderSkipped:false},
+        {label:'Negatif %',data:Object.values(B).map(b=>pct(b.neg,b.total)),backgroundColor:'#F56565',borderRadius:4,borderSkipped:false}
+      ]
+    },
+    options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{labels:{color:'#6B8BAD',font:{family:'Plus Jakarta Sans',size:10},boxWidth:10}}},
+      scales:{x:{ticks:{color:'#3D5470',font:{family:'Plus Jakarta Sans',size:10}},grid:{color:'#182336'}},
+        y:{ticks:{color:'#3D5470',font:{family:'Plus Jakarta Sans',size:10},callback:v=>v+'%'},grid:{color:'#182336'},max:100}}}
+  });
+}
+
+function buildRadar(){
+  const labels=['Sentimen Positif','Engagement Volume','Brand Loyalty','Tenant Kelengkapan','Viral Potensi'];
+  new Chart(document.getElementById('radarChart').getContext('2d'),{
+    type:'radar',
+    data:{labels,datasets:Object.entries(B).map(([k,b])=>({
+      label:b.short,
+      data:{fairway:[75,40,45,35,65],pakuwon:[67,100,70,100,75],tunjungan:[72,93,65,90,80],galaxy:[75,84,90,75,70],ciputra:[77,100,70,75,95]}[k],
+      borderColor:b.color,backgroundColor:hexA(b.color,.07),pointBackgroundColor:b.color,
+      borderWidth:k==='fairway'?2.5:1.5,pointRadius:k==='fairway'?4:2.5
+    }))},
+    options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{display:false}},
+      scales:{r:{min:0,max:100,ticks:{display:false},grid:{color:'#182336'},pointLabels:{color:'#4A6080',font:{family:'Plus Jakarta Sans',size:10}},angleLines:{color:'#182336'}}}}
+  });
+  document.getElementById('radarLegend').innerHTML=Object.values(B).map(b=>`<div style="display:flex;align-items:center;gap:5px;font-size:10px;color:var(--muted2)"><div style="width:8px;height:8px;border-radius:50%;background:${b.color}"></div>${b.short}</div>`).join('');
+}
+
+function buildHBar(){
+  new Chart(document.getElementById('horizontalBar').getContext('2d'),{
+    type:'bar',
+    data:{
+      labels:Object.values(B).map(b=>b.short),
+      datasets:[
+        {label:'Positif',data:Object.values(B).map(b=>b.pos),backgroundColor:Object.values(B).map(b=>hexA(b.color,.85)),borderRadius:4,borderSkipped:false},
+        {label:'Netral', data:Object.values(B).map(b=>b.neu),backgroundColor:'#1E2E42',borderRadius:4,borderSkipped:false},
+        {label:'Negatif',data:Object.values(B).map(b=>b.neg),backgroundColor:'#F5656580',borderRadius:4,borderSkipped:false}
+      ]
+    },
+    options:{indexAxis:'y',responsive:true,maintainAspectRatio:true,
+      plugins:{legend:{labels:{color:'#6B8BAD',font:{family:'Plus Jakarta Sans',size:10},boxWidth:10}}},
+      scales:{x:{ticks:{color:'#3D5470',font:{family:'Plus Jakarta Sans',size:10}},grid:{color:'#182336'},stacked:true},
+        y:{ticks:{color:'#6B8BAD',font:{family:'Plus Jakarta Sans',size:11,weight:'600'}},grid:{display:false},stacked:true}}}
+  });
+}
+
+function buildBubble(){
+  new Chart(document.getElementById('bubbleChart').getContext('2d'),{
+    type:'bubble',
+    data:{datasets:Object.values(B).map(b=>({
+      label:b.short,
+      data:[{x:b.total,y:b.score,r:Math.max(8,b.followers/15)}],
+      backgroundColor:hexA(b.color,.35),borderColor:b.color,borderWidth:2
+    }))},
+    options:{responsive:true,maintainAspectRatio:true,
+      plugins:{legend:{labels:{color:'#6B8BAD',font:{family:'Plus Jakarta Sans',size:10},boxWidth:10}},
+        tooltip:{callbacks:{label:d=>`${d.dataset.label}: ${d.raw.x} komentar, skor ${d.raw.y}`}}},
+      scales:{
+        x:{title:{display:true,text:'Volume Komentar',color:'#3D5470',font:{size:10}},ticks:{color:'#3D5470',font:{size:10}},grid:{color:'#182336'},min:0,max:55},
+        y:{title:{display:true,text:'Skor Sentimen',color:'#3D5470',font:{size:10}},ticks:{color:'#3D5470',font:{size:10}},grid:{color:'#182336'},min:60,max:85}
+      }}
+  });
+}
+
+function buildFollowersBar(){
+  new Chart(document.getElementById('followersBar').getContext('2d'),{
+    type:'bar',
+    data:{
+      labels:Object.values(B).map(b=>b.short),
+      datasets:[{label:'Followers Instagram (ribu)',data:Object.values(B).map(b=>b.followers),backgroundColor:Object.values(B).map(b=>hexA(b.color,.8)),borderRadius:6,borderSkipped:false}]
+    },
+    options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{display:false}},
+      scales:{x:{ticks:{color:'#3D5470',font:{family:'Plus Jakarta Sans',size:10}},grid:{color:'#182336'}},
+        y:{ticks:{color:'#3D5470',font:{family:'Plus Jakarta Sans',size:10},callback:v=>v+'K'},grid:{color:'#182336'}}}}
+  });
+}
+
+function buildGapRadar(){
+  new Chart(document.getElementById('gapRadar').getContext('2d'),{
+    type:'radar',
+    data:{labels:['Engagement Volume','Sentiment Score','Brand Loyalty','Tenant F&B','Instagramability'],
+      datasets:[
+        {label:'Fairway Nine (Saat Ini)',data:[20,75,45,35,90],borderColor:'#00D48E',backgroundColor:'rgba(0,212,142,.1)',pointBackgroundColor:'#00D48E',borderWidth:2.5,pointRadius:4},
+        {label:'Benchmark Terbaik',      data:[100,77,90,100,90],borderColor:'#EF4444',backgroundColor:'rgba(239,68,68,.04)',pointBackgroundColor:'#EF4444',borderWidth:1.5,pointRadius:3,borderDash:[5,4]},
+        {label:'Target Q3 2026',         data:[60,80,65,65,90],borderColor:'#F59E0B',backgroundColor:'rgba(245,158,11,.05)',pointBackgroundColor:'#F59E0B',borderWidth:1.5,pointRadius:3,borderDash:[3,3]}
+      ]},
+    options:{responsive:true,maintainAspectRatio:true,
+      plugins:{legend:{labels:{color:'#6B8BAD',font:{family:'Plus Jakarta Sans',size:10},boxWidth:10}}},
+      scales:{r:{min:0,max:100,ticks:{display:false},grid:{color:'#182336'},pointLabels:{color:'#4A6080',font:{family:'Plus Jakarta Sans',size:10}},angleLines:{color:'#182336'}}}}
+  });
+}
+
+function buildRanking(){
+  const medals=['#EDB855','#9CA3AF','#A0754D','#3D5470','#3D5470'];
+  document.getElementById('rankingList').innerHTML=RANK.map((k,i)=>{
+    const b=B[k];
+    return`<div class="rank-row" style="${k==='fairway'?`background:${hexA(b.color,.07)};border:1px solid ${hexA(b.color,.2)};`:''}">
+      <div class="rank-medal" style="background:${medals[i]};color:#06090F">${i+1}</div>
+      <div class="rank-info">
+        <div class="rank-name">${b.short} ${k==='fairway'?'<span class="you-badge">ANDA</span>':''}</div>
+        <div class="rank-bar-t"><div class="rank-bar-f" style="width:${b.score}%;background:${b.color}"></div></div>
+      </div>
+      <div class="rank-score" style="color:${b.color}">${b.score}</div>
+    </div>`;
+  }).join('');
+}
+
+function switchBrand(key,tabEl){
+  const b=B[key];
+  document.querySelectorAll('.brand-tab').forEach(t=>{t.classList.remove('active');t.style.borderColor='';t.style.color='';});
+  tabEl.classList.add('active');tabEl.style.borderColor=b.color;tabEl.style.color=b.color;
+  // score card
+  const sc=document.getElementById('scoreCard');
+  sc.style.background=`linear-gradient(135deg,${hexA(b.color,.08)},${hexA(b.color,.02)})`;
+  sc.style.borderColor=hexA(b.color,.3);
+  document.getElementById('scoreNum').textContent=b.score;
+  document.getElementById('scoreNum').style.color=b.color;
+  document.getElementById('scoreBar').style.width=b.score+'%';
+  document.getElementById('scoreBar').style.background=b.color;
+  document.getElementById('scoreTotal').textContent=b.total+' komentar';
+  const zb=document.getElementById('zeroBadge');
+  if(key==='fairway'){zb.style.background='#F59E0B12';zb.style.borderColor='#F59E0B35';zb.style.color='#F59E0B';zb.textContent='⚠ VOLUME RENDAH';}
+  else if(b.neg===0){zb.style.background='#00D48E12';zb.style.borderColor='#00D48E35';zb.style.color='#00D48E';zb.textContent='✓ ZERO NEGATIF';}
+  else{zb.style.background='#EF444412';zb.style.borderColor='#EF444435';zb.style.color='#EF4444';zb.textContent=`${pct(b.neg,b.total)}% negatif`;}
+  // dist
+  document.getElementById('distTitle').textContent=b.name;
+  document.getElementById('pctBars').innerHTML=[{l:'Positif',v:b.pos,c:'#00D48E'},{l:'Netral',v:b.neu,c:'#3D5470'},{l:'Negatif',v:b.neg,c:'#F56565'}].map(r=>`
+    <div class="pct-row"><span class="pct-label" style="color:${r.c}">${r.l}</span>
+    <div class="pct-bar-t"><div class="pct-bar-f" style="width:${pct(r.v,b.total)}%;background:${r.c}"></div></div>
+    <span class="pct-val" style="color:${r.c}">${pct(r.v,b.total)}%</span></div>`).join('');
+  document.getElementById('brandContextBox').innerHTML=`<div style="padding:10px 12px;background:${hexA(b.color,.05)};border:1px solid ${hexA(b.color,.2)};border-radius:8px;font-size:11px;color:var(--muted2);line-height:1.6">${b.ctx}</div>`;
+  // comments
+  document.getElementById('commentsTitle').textContent=b.name;
+  document.getElementById('commentsList').innerHTML=b.comments.map(c=>`<div class="quote" style="border-left-color:${b.color}">${c}</div>`).join('');
+  // pie legend
+  document.getElementById('pieLegend').innerHTML=[{l:'Positif',v:b.pos,c:'#00D48E'},{l:'Netral',v:b.neu,c:'#3D5470'},{l:'Negatif',v:b.neg,c:'#F56565'}].map(r=>`
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+    <div style="width:10px;height:10px;border-radius:2px;background:${r.c};flex-shrink:0"></div>
+    <span style="font-size:12px;color:#6B8BAD;flex:1">${r.l}</span>
+    <span style="font-size:16px;font-weight:800;color:${r.c}">${pct(r.v,b.total)}%</span></div>`).join('');
+  buildPie(b);
+}
+
+function setNav(el){
+  document.querySelectorAll('.nav-link').forEach(n=>n.classList.remove('active'));
+  el.classList.add('active');
+}
+window.addEventListener('scroll',()=>{
+  const ids=['executive','sentiment','usp','competitor','gap','swot'];
+  let cur=ids[0];
+  ids.forEach(id=>{const el=document.getElementById(id);if(el&&window.scrollY>=el.offsetTop-80)cur=id;});
+  document.querySelectorAll('.nav-link').forEach(n=>n.classList.toggle('active',n.getAttribute('href')==='#'+cur));
+});
+
+window.onload=()=>{
+  buildPie(B.fairway);buildBar();buildRadar();buildHBar();buildBubble();buildFollowersBar();buildGapRadar();buildRanking();
+  switchBrand('fairway',document.getElementById('tab-fairway'));
+};
+</script>
+</body>
+</html>
